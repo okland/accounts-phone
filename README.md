@@ -19,11 +19,11 @@ Let's say you want to register new user and verify him using his phone number
 
 Creating new user
 ```js
-var userPhone = '+972545999999';
-// Create a user.
-Accounts.createUser({phone:userPhone, password:'VerySecure'}, function (){});
-// Debug: Verify the user phone isn't confirmed it.
-console.log('Phone verification status is :', Accounts.isPhoneVerified());
+  var userPhone = '+972545999999';
+  // Create a user.
+  Accounts.createUser({phone:userPhone, password:'VerySecure'}, function (){});
+  // Debug: Verify the user phone isn't confirmed it.
+  console.log('Phone verification status is :', Accounts.isPhoneVerified());
 ```
 
 Verify phone number
@@ -41,15 +41,16 @@ var userPhone = '+972545999999';
  Accounts.verifyPhone(userPhone, verificationCode, newPassword, function(){});
   //Debug:  Verify the user phone is confirmed.
   console.log('Phone verification status is :', Accounts.isPhoneVerified());
- ```
+```
 
- Login existing user
- ```js
+Login existing user
+
+```js
  var userPhone = '+972545999999';
  var password = 'VerySecure';
  var callback = function() {};
  Meteor.loginWithPhoneAndPassword({phone:userPhone}, password, callback);
- ```
+```
 
 
 
