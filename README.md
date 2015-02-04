@@ -58,14 +58,14 @@ Login existing user
 
 If you are using twilio :
  you can just put your twilio credentials on server.
-'''js
+```js
      SMS.twilio = {ACCOUNT_SID: 'XXXXXXXXXXXXXXXXXXXXX', AUTH_TOKEN: 'XXXXXXXXXXXXXXXXXXXX'};
-'''
+```
 
 otherwise you can just override the function
-'''js
+```js
      SMS.send = function (options) {};
-'''
+```
      Where the parameter options is an object containing :
       * @param options
       * @param options.from {String} - The sending SMS number
@@ -74,14 +74,14 @@ otherwise you can just override the function
 
 Moreover to control the Sending number and the message content you can override the phone Template
 
-'''js
+```js
   SMS.phoneTemplates = {
     from: '+9729999999',
     text: function (user, code) {
         return 'Welcome your invitation code is: ' + code;
     }
   };
-'''
+```
 
  Note: it can only be done on server
 
@@ -90,7 +90,7 @@ Moreover to control the Sending number and the message content you can override 
 
 
 ## API
-'''js
+```js
  /**
   * @summary Log the user in with a password.
   * @locus Client
@@ -136,7 +136,7 @@ Moreover to control the Sending number and the message content you can override 
   */
  Accounts.isPhoneVerified = function () {  };
 
-'''
+```
 
 
 
@@ -157,9 +157,9 @@ Moreover to control the Sending number and the message content you can override 
 
  For example to change the verificationMaxRetries to 3 all we need to do is
  On the server
- '''
+```js
   Accounts._options.verificationMaxRetries = 3;
- '''
+```
 
 
 
