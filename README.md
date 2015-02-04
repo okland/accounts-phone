@@ -59,12 +59,12 @@ Login existing user
 If you are using twilio :
  you can just put your twilio credentials on server.
 ```js
-     SMS.twilio = {ACCOUNT_SID: 'XXXXXXXXXXXXXXXXXXXXX', AUTH_TOKEN: 'XXXXXXXXXXXXXXXXXXXX'};
+SMS.twilio = {ACCOUNT_SID: 'XXXXXXXXXXXXXXXXXXXXX', AUTH_TOKEN: 'XXXXXXXXXXXXXXXXXXXX'};
 ```
 
 otherwise you can just override the function
 ```js
-     SMS.send = function (options) {};
+ SMS.send = function (options) {};
 ```
      Where the parameter options is an object containing :
       * @param options
@@ -158,7 +158,7 @@ Moreover to control the Sending number and the message content you can override 
  For example to change the verificationMaxRetries to 3 all we need to do is
  On the server
 ```js
-  Accounts._options.verificationMaxRetries = 3;
+Accounts._options.verificationMaxRetries = 3;
 ```
 
 
