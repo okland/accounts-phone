@@ -138,10 +138,7 @@ Moreover to control the Sending number and the message content you can override 
 
 ```
 
-
-
-
- ## Settings you can control
+## Settings - you can control
 
  verificationCodeLength    : The length of the verification code,
  verificationMaxRetries    : The number of SMS cerification tries before verification temporary lock,
