@@ -24,7 +24,7 @@ var userPhone = '+972545999999';
 Accounts.createUser({phone:userPhone, password:'VerySecure'}, function (){});
 // Debug: Verify the user phone isn't confirmed it.
 console.log('Phone verification status is :', Accounts.isPhoneVerified());
-
+```
 
 Verify phone number
 ```js
@@ -41,7 +41,7 @@ var userPhone = '+972545999999';
  Accounts.verifyPhone(userPhone, verificationCode, newPassword, function(){});
   //Debug:  Verify the user phone is confirmed.
   console.log('Phone verification status is :', Accounts.isPhoneVerified());
-
+ ```
 
  Login existing user
  ```js
@@ -49,7 +49,7 @@ var userPhone = '+972545999999';
  var password = 'VerySecure';
  var callback = function() {};
  Meteor.loginWithPhoneAndPassword({phone:userPhone}, password, callback);
-
+ ```
 
 
 
