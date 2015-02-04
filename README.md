@@ -24,7 +24,7 @@ Creating new user
   // Create a user.
   Accounts.createUser({phone:userPhone, password:'VerySecure'}, function (){});
   // Debug: Verify the user phone isn't confirmed it.
-  console.log('Phone verification status is :', Accounts.isPhoneVerified());
+  console.debug('Phone verification status is :', Accounts.isPhoneVerified());
 ```
 
 Verify phone number
@@ -33,15 +33,15 @@ var userPhone = '+972545999999';
 // Request for sms phone verification -- please note before receiving SMS you should Follow the SMS Integration tutorial below
  Accounts.requestPhoneVerification(userPhone, function(){});
  //Debug:  Verify the user phone isn't confirmed it.
- console.log('Phone verification status is :', Accounts.isPhoneVerified());
+ console.debug('Phone verification status is :', Accounts.isPhoneVerified());
 
  // After receiving SMS let user enter his code and verify account by sending it to the server
  var verificationCode = 'CodeRecivedBySMS';
  var newPassword = null;
  // You can keep your old password by sending null in the password field
  Accounts.verifyPhone(userPhone, verificationCode, newPassword, function(){});
-  //Debug:  Verify the user phone is confirmed.
-  console.log('Phone verification status is :', Accounts.isPhoneVerified());
+ //Debug:  Verify the user phone is confirmed.
+ console.debug('Phone verification status is :', Accounts.isPhoneVerified());
 ```
 
 Login existing user
