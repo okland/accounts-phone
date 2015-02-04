@@ -24,7 +24,7 @@ Creating new user
   // Create a user.
   Accounts.createUser({phone:userPhone, password:'VerySecure'}, function (){});
   // Debug: Verify the user phone isn't confirmed it.
-  console.debug('Phone verification status is :', Accounts.isPhoneVerified());
+  console.log('Phone verification status is :', Accounts.isPhoneVerified());
 ```
 
 Verify phone number
@@ -33,7 +33,7 @@ var userPhone = '+972545999999';
 // Request for sms phone verification -- please note before receiving SMS you should Follow the SMS Integration tutorial below
  Accounts.requestPhoneVerification(userPhone, function(){});
  //Debug:  Verify the user phone isn't confirmed it.
- console.debug('Phone verification status is :', Accounts.isPhoneVerified());
+ console.log('Phone verification status is :', Accounts.isPhoneVerified());
 
  // After receiving SMS let user enter his code and verify account by sending it to the server
  var verificationCode = 'CodeRecivedBySMS';
@@ -41,7 +41,7 @@ var userPhone = '+972545999999';
  // You can keep your old password by sending null in the password field
  Accounts.verifyPhone(userPhone, verificationCode, newPassword, function(){});
  //Debug:  Verify the user phone is confirmed.
- console.debug('Phone verification status is :', Accounts.isPhoneVerified());
+ console.log('Phone verification status is :', Accounts.isPhoneVerified());
 ```
 
 Login existing user
@@ -67,7 +67,7 @@ otherwise you can just override the function
 ```js
  SMS.send = function (options) {};
 ```
-     Where the parameter options is an object containing :
+  Where the parameter options is an object containing :
       * @param options
       * @param options.from {String} - The sending SMS number
       * @param options.to {String} - The receiver SMS number
@@ -84,7 +84,7 @@ Moreover to control the Sending number and the message content you can override 
   };
 ```
 
- Note: it can only be done on server
+* Note: it can only be done on server
 
 
 
@@ -141,12 +141,12 @@ Moreover to control the Sending number and the message content you can override 
 
 ## Settings - you can control
 
- verificationCodeLength    : The length of the verification code,
- verificationMaxRetries    : The number of SMS cerification tries before verification temporary lock,
- verificationWaitTime      : The verification lock time if tried more than max sms retries,
- sendPhoneVerificationCodeOnCreation  : Whether to send phone number verification on user creation,
- forbidClientAccountCreation: Don't let client create user on server,
- phoneVerificationMasterCode: Optional master code if exists let user verify account by entering this code
+ - verificationCodeLength    : The length of the verification code
+ - verificationMaxRetries    : The number of SMS cerification tries before verification temporary lock
+ - verificationWaitTime      : The verification lock time if tried more than max sms retries
+ - sendPhoneVerificationCodeOnCreation  : Whether to send phone number verification on user creation
+ - forbidClientAccountCreation: Don't let client create user on server
+ - phoneVerificationMasterCode: Optional master code if exists let user verify account by entering this code
 
 
  In order to change those settings just override the property under
