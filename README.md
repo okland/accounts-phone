@@ -149,12 +149,11 @@ Moreover to control the Sending number and the message content you can override 
  - phoneVerificationMasterCode: Optional master code if exists let user verify account by entering this code
 
 
- In order to change those settings just override the property under
+ In order to change those settings just override the property under :
 
  Accounts._options
 
- For example to change the verificationMaxRetries to 3 all we need to do is
- On the server
+ For example to change the verificationMaxRetries to 3 all we need to do is:
 ```js
 Accounts._options.verificationMaxRetries = 3;
 ```
