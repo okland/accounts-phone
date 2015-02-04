@@ -58,12 +58,12 @@ Login existing user
 
 If you are using twilio :
  you can just put your twilio credentials on server.
- '''
+'''js
      SMS.twilio = {ACCOUNT_SID: 'XXXXXXXXXXXXXXXXXXXXX', AUTH_TOKEN: 'XXXXXXXXXXXXXXXXXXXX'};
- '''
+'''
 
 otherwise you can just override the function
-'''
+'''js
      SMS.send = function (options) {};
 '''
      Where the parameter options is an object containing :
@@ -90,7 +90,7 @@ Moreover to control the Sending number and the message content you can override 
 
 
 ## API
-
+'''js
  /**
   * @summary Log the user in with a password.
   * @locus Client
@@ -98,7 +98,7 @@ Moreover to control the Sending number and the message content you can override 
   * @param {String} password The user's password.
   * @param {Function} [callback] Optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
   */
- Meteor.loginWithPhoneAndPassword = function (selector, password, callback) { ... }
+ Meteor.loginWithPhoneAndPassword = function (selector, password, callback) {  };
 
  /**
   * @summary Create a new user.
@@ -109,7 +109,7 @@ Moreover to control the Sending number and the message content you can override 
   * @param {Object} options.profile The user's profile, typically including the `name` field.
   * @param {Function} [callback] Client only, optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
   */
- Accounts.createUser = function (options, callback) { ... }
+ Accounts.createUser = function (options, callback) { };
 
  /**
   * @summary Request a new verification code.
@@ -117,7 +117,7 @@ Moreover to control the Sending number and the message content you can override 
   * @param {String} phone -  The phone we send the verification code to.
   * @param {Function} [callback] Optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
   */
- Accounts.requestPhoneVerification = function (phone, callback)  { ... }
+ Accounts.requestPhoneVerification = function (phone, callback)  {  };
 
  /**
   * @summary Marks the user's phone as verified. Optional change passwords, Logs the user in afterwards..
@@ -127,16 +127,16 @@ Moreover to control the Sending number and the message content you can override 
   * @param {String} newPassword, Optional, A new password for the user. This is __not__ sent in plain text over the wire.
   * @param {Function} [callback] Optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
   */
- Accounts.verifyPhone = function (phone, code, newPassword, callback) {...}
+ Accounts.verifyPhone = function (phone, code, newPassword, callback) {...};
 
 
  /**
   * Returns whether the current user phone is verified
   * @returns {boolean} Whether the user phone is verified
   */
- Accounts.isPhoneVerified = function () { ... }
+ Accounts.isPhoneVerified = function () {  };
 
-
+'''
 
 
 
