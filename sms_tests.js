@@ -4,6 +4,9 @@
 var phone1;
 var code;
 
+// Allow 1 mil between sending sms
+Accounts,_options.verificationWaitTime = 1;
+
 Accounts._isolateLoginTokenForTest();
 
 testAsyncMulti("accounts sms - verification flow", [

@@ -5,6 +5,7 @@
 // @param password {String}
 // @param callback {Function(error|undefined)}
 
+
 /**
  * @summary Log the user in with a password.
  * @locus Client
@@ -96,18 +97,16 @@ var srpUpgradePath = function (options, callback) {
  * @locus Anywhere
  * @param {Object} options
  * @param {String} options.phone The user's full phone number.
- * @param {String} options.password The user's password. This is __not__ sent in plain text over the wire.
+ * @param {String} options.password, Optional -- (optional) The user's password. This is __not__ sent in plain text over the wire.
  * @param {Object} options.profile The user's profile, typically including the `name` field.
  * @param {Function} [callback] Client only, optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
  */
 Accounts.createUser = function (options, callback) {
     options = _.clone(options); // we'll be modifying options
 
-    if (typeof options.password !== 'string')
-        throw new Error("Must set options.password");
-    if (!options.password) {
-        callback(new Meteor.Error(400, "Password may not be empty"));
-        return;
+    // If no password was given create random one
+    if (typeof options.password !== 'string' || !options.password) {
+        options.password = Math.random().toString(36).slice(-8);
     }
 
     // Replace password with the hashed password.
@@ -161,8 +160,13 @@ Accounts.verifyPhone = function (phone, code, newPassword, callback) {
     var hashedPassword;
 
     if (newPassword) {
-        check(newPassword, String);
-        hashedPassword = Accounts._hashPassword(newPassword);
+        // If didn't gave newPassword and only callback was given
+        if (typeof(newPassword) === 'function') {
+            callback = newPassword;
+        } else {
+            check(newPassword, String);
+            hashedPassword = Accounts._hashPassword(newPassword);
+        }
     }
     Accounts.callLoginMethod({
         methodName     : 'verifyPhone',

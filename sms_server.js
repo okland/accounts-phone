@@ -29,7 +29,7 @@ var devModeSend = function (options) {
     var future = new Future;
     stream.write("From:" + options.from + "\n");
     stream.write("To:" + options.to + "\n");
-    stream.write("Text:" + options.text + "\n");
+    stream.write("Text:" + options.body + "\n");
     stream.write("====== END SMS #" + devmode_sms_id + " ======\n");
     future['return']();
 };
@@ -87,3 +87,4 @@ SMS.phoneTemplates = {
         return 'Welcome your invitation code is: ' + code;
     }
 };
+

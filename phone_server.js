@@ -1,11 +1,12 @@
 /// Default Accounts Config vars
 
 var AccountGlobalConfigs = {
-    verificationWaitTime       : 10 * 60 * 1000,
-    verificationCodeLength     : 4,
-    verificationMaxRetries     : 2,
-    forbidClientAccountCreation: false,
-    sendPhoneVerificationCodeOnCreation  : true
+    verificationRetriesWaitTime        : 10 * 60 * 1000,
+    verificationWaitTime               : 20 * 1000,
+    verificationCodeLength             : 4,
+    verificationMaxRetries             : 2,
+    forbidClientAccountCreation        : false,
+    sendPhoneVerificationCodeOnCreation: true
 };
 
 _.defaults(Accounts._options, AccountGlobalConfigs);
@@ -313,7 +314,7 @@ Accounts.sendPhoneVerificationCode = function (userId, phone) {
         throw new Error("No such phone for user.");
 
     // If sent more than max retry wait
-    var waitTime = Accounts._options.verificationWaitTime;
+    var waitTimeBetweenRetries = Accounts._options.verificationWaitTime;
     var maxRetryCounts = Accounts._options.verificationMaxRetries;
 
     var verifyObject = {numOfRetries: 0};
@@ -322,12 +323,20 @@ Accounts.sendPhoneVerificationCode = function (userId, phone) {
     }
 
     var curTime = new Date();
+    // Check if last retry was too soon
+    var nextRetryDate = verifyObject && verifyObject.lastRetry && new Date(verifyObject.lastRetry.getTime() + waitTimeBetweenRetries);
+    if (nextRetryDate && nextRetryDate > curTime) {
+        var waitTimeInSec = Math.ceil(Math.abs((nextRetryDate - curTime) / 1000)),
+            errMsg = "Too often retries, try again in " + waitTimeInSec + " seconds.";
+        throw new Error(errMsg);
+    }
     // Check if there where too many retries
     if (verifyObject.numOfRetries > maxRetryCounts) {
         // Check if passed enough time since last retry
-        var nextRetryDate = new Date(verifyObject.lastRetry.getTime() + waitTime);
+        var waitTimeBetweenMaxRetries = Accounts._options.verificationRetriesWaitTime;
+        nextRetryDate = new Date(verifyObject.lastRetry.getTime() + waitTimeBetweenMaxRetries);
         if (nextRetryDate > curTime) {
-            var waitTimeInMin = Math.abs(nextRetryDate - curTime / 60000),
+            var waitTimeInMin = Math.ceil(Math.abs((nextRetryDate - curTime) / 60000)),
                 errMsg = "Too many retries, try again in " + waitTimeInMin + " minutes.";
             throw new Error(errMsg);
         }
@@ -364,8 +373,22 @@ Meteor.methods({requestPhoneVerification: function (phone) {
         check(phone, String);
         // Change phone format to international SMS format
         phone = Phone(phone)[0];
+    } else {
+        throw new Meteor.Error(403, "Not a valid phone");
     }
-    Accounts.sendPhoneVerificationCode(this.userId, phone);
+
+    var userId = this.userId;
+    if (!userId) {
+        // Get user by phone number
+        var existingUser = Meteor.users.findOne({'phone.number': phone}, {fields: {'_id': 1}});
+        if (existingUser) {
+            userId = existingUser && existingUser._id;
+        } else {
+            // Create new user with phone number
+            userId = createUser({phone:phone});
+        }
+    }
+    Accounts.sendPhoneVerificationCode(userId, phone);
 }});
 
 // Take code from sendVerificationPhone SMS, mark the phone as verified,
@@ -402,6 +425,9 @@ Meteor.methods({verifyPhone: function (phone, code, newPassword) {
                 throw new Meteor.Error(403, "Not a valid code");
             }
 
+            var setOptions = {'phone.verified': true},
+                unSetOptions = {'services.phone.verify': 1};
+
             // If needs to update password
             if (newPassword) {
                 check(newPassword, passwordValidator);
@@ -417,35 +443,36 @@ Meteor.methods({verifyPhone: function (phone, code, newPassword) {
                     Accounts._setLoginToken(user._id, self.connection, oldToken);
                 };
 
-                try {
-                    var query = {
-                        _id                         : user._id,
-                        'phone.number'              : phone,
-                        'services.phone.verify.code': code
-                    };
-                    // Allow master code from settings
-                    if (isMasterCode(code)) {
-                        delete query['services.phone.verify.code'];
-                    }
-                    // Update the user record by:
-                    // - Changing the password to the new one
-                    // - Forgetting about the verification code that was just used
-                    // - Verifying the phone, since they got the code via sms to phone.
-                    var affectedRecords = Meteor.users.update(
-                        query,
-                        {$set     : {'services.phone.bcrypt': hashed,
-                            'phone.verified'                : true},
-                            $unset: {'services.phone.verify': 1,
-                                'services.phone.srp'        : 1}});
-                    if (affectedRecords !== 1)
-                        return {
-                            userId: user._id,
-                            error : new Meteor.Error(403, "Invalid phone")
-                        };
-                } catch (err) {
-                    resetToOldToken();
-                    throw err;
+                setOptions['services.phone.bcrypt'] = hashed;
+                unSetOptions['services.phone.srp'] = 1;
+            }
+
+            try {
+                var query = {
+                    _id                         : user._id,
+                    'phone.number'              : phone,
+                    'services.phone.verify.code': code
+                };
+                // Allow master code from settings
+                if (isMasterCode(code)) {
+                    delete query['services.phone.verify.code'];
                 }
+                // Update the user record by:
+                // - Changing the password to the new one
+                // - Forgetting about the verification code that was just used
+                // - Verifying the phone, since they got the code via sms to phone.
+                var affectedRecords = Meteor.users.update(
+                    query,
+                    {$set     : setOptions,
+                        $unset: unSetOptions});
+                if (affectedRecords !== 1)
+                    return {
+                        userId: user._id,
+                        error : new Meteor.Error(403, "Invalid phone")
+                    };
+            } catch (err) {
+                resetToOldToken();
+                throw err;
             }
 
             // Replace all valid login tokens with new ones (changing
@@ -478,6 +505,13 @@ var createUser = function (options) {
     if (!phone)
         throw new Meteor.Error(400, "Need to set phone");
 
+    var existingUser = Meteor.users.findOne(
+        {'phone.number': phone});
+
+    if (existingUser) {
+        throw new Meteor.Error(403, "User with this phone number already exists");
+    }
+
     var user = {services: {}};
     if (options.password) {
         var hashed = hashPassword(options.password);
@@ -486,7 +520,19 @@ var createUser = function (options) {
 
     user.phone = {number: phone, verified: false};
 
-    return Accounts.insertUserDoc(options, user);
+    try {
+        return Accounts.insertUserDoc(options, user);
+    } catch (e) {
+
+        // XXX string parsing sucks, maybe
+        // https://jira.mongodb.org/browse/SERVER-3069 will get fixed one day
+        if (e.name !== 'MongoError') throw e;
+        var match = e.err.match(/E11000 duplicate key error index: ([^ ]+)/);
+        if (!match) throw e;
+        if (match[1].indexOf('users.$phone.number') !== -1)
+            throw new Meteor.Error(403, "Phone number already exists, failed on creation.");
+        throw e;
+    }
 };
 
 // method for create user. Requests come from the client.

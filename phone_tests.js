@@ -1,9 +1,8 @@
-
 Accounts._noConnectionCloseDelayForTest = true;
 
 if (Meteor.isServer) {
     Meteor.methods({
-        getUserId: function () {
+        getUserId          : function () {
             return this.userId;
         },
         getVerificationCode: function () {
@@ -12,8 +11,6 @@ if (Meteor.isServer) {
         }
     });
 }
-
-
 
 if (Meteor.isClient) (function () {
 
@@ -56,11 +53,10 @@ if (Meteor.isClient) (function () {
         }));
     };
 
-
     testAsyncMulti("phones - basic login with password", [
         function (test, expect) {
             // setup
-            this.phone = '+97254580'+ (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
+            this.phone = '+97254580' + (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
             this.password = 'password';
 
             Accounts.createUser(
@@ -107,24 +103,25 @@ if (Meteor.isClient) (function () {
         logoutStep
     ]);
 
-
     testAsyncMulti("passwords - plain text passwords", [
         function (test, expect) {
             // setup
-            this.phone = '+97254580'+ (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
+            this.phone = '+97254580' + (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
             this.password = 'password';
 
             // create user with raw password (no API, need to invoke callLoginMethod
             // directly)
             Accounts.callLoginMethod({
-                methodName: 'createUser',
-                methodArguments: [{phone: this.phone, password: this.password}],
-                userCallback: loggedInAs(this.phone, test, expect)
+                methodName     : 'createUser',
+                methodArguments: [
+                    {phone: this.phone, password: this.password}
+                ],
+                userCallback   : loggedInAs(this.phone, test, expect)
             });
         },
         logoutStep,
         // check can login normally with this password.
-        function(test, expect) {
+        function (test, expect) {
             Meteor.loginWithPhoneAndPassword({phone: this.phone}, this.password,
                 loggedInAs(this.phone, test, expect));
         },
@@ -134,8 +131,10 @@ if (Meteor.isClient) (function () {
         function (test, expect) {
             Accounts.callLoginMethod({
                 // wrong password
-                methodArguments: [{user: {phone: this.phone}, password: 'wrong'}],
-                userCallback: expect(function (error) {
+                methodArguments: [
+                    {user: {phone: this.phone}, password: 'wrong'}
+                ],
+                userCallback   : expect(function (error) {
                     test.isTrue(error);
                     test.isFalse(Meteor.user());
                 })});
@@ -143,9 +142,11 @@ if (Meteor.isClient) (function () {
         function (test, expect) {
             Accounts.callLoginMethod({
                 // right password
-                methodArguments: [{user: {phone: this.phone},
-                    password: this.password}],
-                userCallback: loggedInAs(this.phone, test, expect)
+                methodArguments: [
+                    {user       : {phone: this.phone},
+                        password: this.password}
+                ],
+                userCallback   : loggedInAs(this.phone, test, expect)
             });
         },
         logoutStep
@@ -829,43 +830,41 @@ if (Meteor.isClient) (function () {
 //        },
 //        logoutStep
 //    ]);
-}) ();
-
+})();
 
 if (Meteor.isServer) (function () {
 
     Tinytest.add(
         'passwords - setup more than one onCreateUserHook',
         function (test) {
-            test.throws(function() {
-                Accounts.onCreateUser(function () {});
-            });
-        });
-
-
-    Tinytest.add(
-        'passwords - createUser hooks',
-        function (test) {
-            var phone = '+97254580'+ (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
-
             test.throws(function () {
-                // should fail the new user validators
-                Accounts.createUser({phone: phone, profile: {invalid: true}});
+                Accounts.onCreateUser(function () {
+                });
             });
-
-            var userId = Accounts.createUser({phone: phone,
-                testOnCreateUserHook: true});
-
-            test.isTrue(userId);
-            var user = Meteor.users.findOne(userId);
-            test.equal(user.profile.touchedByOnCreateUser, true);
         });
 
+//    Tinytest.add(
+//        'passwords - createUser hooks',
+//        function (test) {
+//            var phone = '+97254580'+ (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
+//
+//            test.throws(function () {
+//                // should fail the new user validators
+//                Accounts.createUser({phone: phone, profile: {invalid: true}});
+//            });
+//
+//            var userId = Accounts.createUser({phone: phone,
+//                testOnCreateUserHook: true});
+//
+//            test.isTrue(userId);
+//            var user = Meteor.users.findOne(userId);
+//            test.equal(user.profile.touchedByOnCreateUser, true);
+//        });
 
     Tinytest.add(
         'passwords - setPassword',
         function (test) {
-            var phone = '+97254580'+ (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
+            var phone = '+97254580' + (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
 
             var userId = Accounts.createUser({phone: phone});
 
@@ -895,10 +894,15 @@ if (Meteor.isServer) (function () {
             test.isFalse(Meteor.users.findOne(userId).services.phone.verify);
             test.isFalse(Meteor.users.findOne(userId).services.resume.loginTokens);
 
+
+            try {
+                Accounts.createUser({phone: phone});
+            } catch (e) {
+                test.isTrue(e, 'Don\'t two users with same phone');
+            }
             // cleanup
             Meteor.users.remove(userId);
         });
-
 
     // This test properly belongs in accounts-base/accounts_tests.js, but
     // this is where the tests that actually log in are.
@@ -958,4 +962,4 @@ if (Meteor.isServer) (function () {
 //            );
 //        }
 //    );
-}) ();
+})();

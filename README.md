@@ -18,42 +18,22 @@ $ meteor add okland:accounts-phone
 
 Let's say you want to register new user and verify him using his phone number
 
-Creating new user
-```js
-  var userPhone = '+972545999999';
-  // Create a user.
-  Accounts.createUser({phone:userPhone, password:'VerySecure'}, function (){});
-  // Debug: Verify the user phone isn't confirmed it.
-  console.log('Phone verification status is :', Accounts.isPhoneVerified());
-```
+Verify phone number - Create user if not exists
 
-Verify phone number
 ```js
 var userPhone = '+972545999999';
 // Request for sms phone verification -- please note before receiving SMS you should Follow the SMS Integration tutorial below
- Accounts.requestPhoneVerification(userPhone, function(){});
- //Debug:  Verify the user phone isn't confirmed it.
- console.log('Phone verification status is :', Accounts.isPhoneVerified());
+Accounts.requestPhoneVerification(userPhone, function(){});
+//Debug:  Verify the user phone isn't confirmed it.
+console.log('Phone verification status is :', Accounts.isPhoneVerified());
 
- // After receiving SMS let user enter his code and verify account by sending it to the server
- var verificationCode = 'CodeRecivedBySMS';
- var newPassword = null;
- // You can keep your old password by sending null in the password field
- Accounts.verifyPhone(userPhone, verificationCode, newPassword, function(){});
- //Debug:  Verify the user phone is confirmed.
- console.log('Phone verification status is :', Accounts.isPhoneVerified());
+// After receiving SMS let user enter his code and verify account by sending it to the server
+var verificationCode = 'CodeRecivedBySMS';
+
+Accounts.verifyPhone(userPhone, verificationCode, function(){});
+//Debug:  Verify the user phone is confirmed.
+console.log('Phone verification status is :', Accounts.isPhoneVerified());
 ```
-
-Login existing user
-
-```js
- var userPhone = '+972545999999';
- var password = 'VerySecure';
- var callback = function() {};
- Meteor.loginWithPhoneAndPassword({phone:userPhone}, password, callback);
-```
-
-
 
 ## SMS Integration
 
@@ -87,11 +67,105 @@ Moreover to control the Sending number and the message content you can override 
 * Note: it can only be done on server
 
 
-
-
-
-## API
+## Simple API
 ```js
+
+ /**
+  * @summary Request a new verification code. create user if not exist
+  * @locus Client
+  * @param {String} phone -  The phone we send the verification code to.
+  * @param {Function} [callback] Optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
+  */
+ Accounts.requestPhoneVerification = function (phone, callback)  {  };
+
+ /**
+  * @summary Marks the user's phone as verified. Optional change passwords, Logs the user in afterwards..
+  * @locus Client
+  * @param {String} phone - The phone number we want to verify.
+  * @param {String} code - The code retrieved in the SMS.
+  * @param {Function} [callback] Optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
+  */
+ Accounts.verifyPhone = function (phone, code, callback) {...};
+
+
+ /**
+  * Returns whether the current user phone is verified
+  * @returns {boolean} Whether the user phone is verified
+  */
+ Accounts.isPhoneVerified = function () {  };
+
+```
+
+## Settings - you can control
+
+ - verificationCodeLength    : The length of the verification code
+ - verificationMaxRetries    : The number of SMS verification tries before verification temporary lock
+ - verificationRetriesWaitTime : The verification lock time after max retries
+ - verificationWaitTime      : The verification lock time if between two retries
+ - sendPhoneVerificationCodeOnCreation  : Whether to send phone number verification on user creation
+ - forbidClientAccountCreation: Don't let client create user on server
+ - phoneVerificationMasterCode: Optional master code if exists let user verify account by entering this code
+
+
+ In order to change those settings just override the property under :
+
+ Accounts._options
+
+ For example to change the verificationMaxRetries to 3 all we need to do is:
+```js
+Accounts._options.verificationMaxRetries = 3;
+```
+
+
+## More code samples
+
+
+Creating new user
+```js
+  // Create a user.
+
+  var options = {phone:'+972545999999'};
+  // You can also create user with password
+  options.password = 'VeryHardPassword';
+
+
+  Accounts.createUser(options, function (){});
+  // Debug: Verify the user phone isn't confirmed it.
+  console.log('Phone verification status is :', Accounts.isPhoneVerified());
+```
+
+```js
+ var userPhone = '+972545999999';
+ // Request for sms phone verification -- please note before receiving SMS you should Follow the SMS Integration tutorial below
+ Accounts.requestPhoneVerification(userPhone, function(){});
+ //Debug:  Verify the user phone isn't confirmed it.
+ console.log('Phone verification status is :', Accounts.isPhoneVerified());
+
+ // After receiving SMS let user enter his code and verify account by sending it to the server
+ var verificationCode = 'CodeRecivedBySMS';
+ var newPassword = null;
+ // You can keep your old password by sending null in the password field
+ Accounts.verifyPhone(userPhone, verificationCode, function(){});
+ //Debug:  Verify the user phone is confirmed.
+ console.log('Phone verification status is :', Accounts.isPhoneVerified());
+```
+
+Login existing user - Requires creating user with password
+
+
+```js
+
+ var userPhone = '+972545999999';
+ var password = 'VerySecure';
+ var callback = function() {};
+ Accounts.createUser({phone:userPhone, password:password}, function (){});
+
+ Meteor.loginWithPhoneAndPassword({phone:userPhone}, password, callback);
+```
+
+## Full API
+```js
+
  /**
   * @summary Log the user in with a password.
   * @locus Client
@@ -137,25 +211,6 @@ Moreover to control the Sending number and the message content you can override 
   */
  Accounts.isPhoneVerified = function () {  };
 
-```
-
-## Settings - you can control
-
- - verificationCodeLength    : The length of the verification code
- - verificationMaxRetries    : The number of SMS cerification tries before verification temporary lock
- - verificationWaitTime      : The verification lock time if tried more than max sms retries
- - sendPhoneVerificationCodeOnCreation  : Whether to send phone number verification on user creation
- - forbidClientAccountCreation: Don't let client create user on server
- - phoneVerificationMasterCode: Optional master code if exists let user verify account by entering this code
-
-
- In order to change those settings just override the property under :
-
- Accounts._options
-
- For example to change the verificationMaxRetries to 3 all we need to do is:
-```js
-Accounts._options.verificationMaxRetries = 3;
 ```
 
 
