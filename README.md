@@ -212,6 +212,13 @@ Login existing user - Requires creating user with password
   */
  Accounts.isPhoneVerified = function () {  };
 
+
+/**
+ * @summary Register a callback to be called after a phone verification attempt succeeds.
+ * @locus Server
+ * @param {Function} func The callback to be called when phone verification is successful.
+ */
+Accounts.onPhoneVerification = function (func) { };
 ```
 
 
