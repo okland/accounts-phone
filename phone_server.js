@@ -11,16 +11,10 @@ var AccountGlobalConfigs = {
 
 _.defaults(Accounts._options, AccountGlobalConfigs);
 
-var Phone = Npm.require('phone');
 
-// Return normalized phone format
-var normalizePhone = function (phone) {
-    // If phone equals to one of admin phone  numbersreturn it as-is
-    if (phone && Accounts._options.adminPhoneNumbers && Accounts._options.adminPhoneNumbers.indexOf(phone) != -1) {
-        return phone;
-    }
-    return Phone(phone)[0];
-};
+/// Phone
+
+var Phone = Npm.require('phone');
 
 /// BCRYPT
 
@@ -479,6 +473,7 @@ Meteor.methods({verifyPhone: function (phone, code, newPassword) {
                         userId: user._id,
                         error : new Meteor.Error(403, "Invalid phone")
                     };
+                successfulVerification();
             } catch (err) {
                 resetToOldToken();
                 throw err;
@@ -637,7 +632,39 @@ Meteor.startup(function () {
     });
 });
 
+/************* Phone verification hook *************/
+
+// Callback exceptions are printed with Meteor._debug and ignored.
+var onPhoneVerificationHook = new Hook({
+    debugPrintExceptions: "onPhoneVerification callback"
+});
+
+/**
+ * @summary Register a callback to be called after a phone verification attempt succeeds.
+ * @locus Server
+ * @param {Function} func The callback to be called when phone verification is successful.
+ */
+Accounts.onPhoneVerification = function (func) {
+    return onPhoneVerificationHook.register(func);
+};
+
+var successfulVerification = function () {
+    onPhoneVerificationHook.each(function (callback) {
+        callback();
+        return true;
+    });
+};
+
 /************* Helper functions ********************/
+
+// Return normalized phone format
+var normalizePhone = function (phone) {
+    // If phone equals to one of admin phone  numbersreturn it as-is
+    if (phone && Accounts._options.adminPhoneNumbers && Accounts._options.adminPhoneNumbers.indexOf(phone) != -1) {
+        return phone;
+    }
+    return Phone(phone)[0];
+};
 
 /**
  * Check whether the given code is the defined master code

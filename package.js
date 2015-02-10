@@ -1,6 +1,6 @@
 Package.describe({
     name         : 'okland:accounts-phone',
-    version      : '0.0.3',
+    version      : '0.0.4',
     // Brief, one-line summary of the package.
     summary      : 'A login service based on mobile phone number for Meteor',
     // URL to the Git repository containing the source code for this package.
@@ -25,6 +25,8 @@ Package.onUse(function (api) {
     api.use('sha@1.0.2', ['client', 'server']);
     api.use('email@1.0.5', ['server']);
     api.use('random@1.0.2', ['server']);
+    api.use('ejson@1.0.5', 'server');
+    api.use('callback-hook@1.0.2', 'server');
     api.use('check@1.0.4');
     api.use('underscore@1.0.2');
     api.use('ddp@1.0.14', ['client', 'server']);
