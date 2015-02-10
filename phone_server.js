@@ -473,7 +473,7 @@ Meteor.methods({verifyPhone: function (phone, code, newPassword) {
                         userId: user._id,
                         error : new Meteor.Error(403, "Invalid phone")
                     };
-                successfulVerification();
+                successfulVerification(user._id);
             } catch (err) {
                 resetToOldToken();
                 throw err;
@@ -648,18 +648,26 @@ Accounts.onPhoneVerification = function (func) {
     return onPhoneVerificationHook.register(func);
 };
 
-var successfulVerification = function () {
+var successfulVerification = function (userId) {
     onPhoneVerificationHook.each(function (callback) {
-        callback();
+        callback(userId);
         return true;
     });
 };
 
+// Give each login hook callback a fresh cloned copy of the attempt
+// object, but don't clone the connection.
+//
+var cloneAttemptWithConnection = function (connection, attempt) {
+    var clonedAttempt = EJSON.clone(attempt);
+    clonedAttempt.connection = connection;
+    return clonedAttempt;
+};
 /************* Helper functions ********************/
 
 // Return normalized phone format
 var normalizePhone = function (phone) {
-    // If phone equals to one of admin phone  numbersreturn it as-is
+    // If phone equals to one of admin phone numbers return it as-is
     if (phone && Accounts._options.adminPhoneNumbers && Accounts._options.adminPhoneNumbers.indexOf(phone) != -1) {
         return phone;
     }
