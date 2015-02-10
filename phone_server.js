@@ -13,6 +13,15 @@ _.defaults(Accounts._options, AccountGlobalConfigs);
 
 var Phone = Npm.require('phone');
 
+// Return normalized phone format
+var normalizePhone = function (phone) {
+    // If phone equals to one of admin phone  numbersreturn it as-is
+    if (phone && Accounts._options.adminPhoneNumbers && Accounts._options.adminPhoneNumbers.indexOf(phone) != -1) {
+        return phone;
+    }
+    return Phone(phone)[0];
+};
+
 /// BCRYPT
 
 var bcrypt = NpmModuleBcrypt;
@@ -372,7 +381,7 @@ Meteor.methods({requestPhoneVerification: function (phone) {
     if (phone) {
         check(phone, String);
         // Change phone format to international SMS format
-        phone = Phone(phone)[0];
+        phone = normalizePhone(phone);
     } else {
         throw new Meteor.Error(403, "Not a valid phone");
     }
@@ -411,7 +420,7 @@ Meteor.methods({verifyPhone: function (phone, code, newPassword) {
                 throw new Meteor.Error(403, "Code is must be provided to method");
             }
             // Change phone format to international SMS format
-            phone = Phone(phone)[0];
+            phone = normalizePhone(phone);
 
             var user = Meteor.users.findOne({
                 "phone.number": phone
@@ -543,7 +552,7 @@ Meteor.methods({createUser: function (options) {
     if (options.phone) {
         check(options.phone, String);
         // Change phone format to international SMS format
-        options.phone = Phone(options.phone)[0];
+        options.phone = normalizePhone(options.phone);
     }
 
     return Accounts._loginMethod(

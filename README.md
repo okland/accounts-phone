@@ -104,7 +104,8 @@ Moreover to control the Sending number and the message content you can override 
  - verificationWaitTime      : The verification lock time if between two retries
  - sendPhoneVerificationCodeOnCreation  : Whether to send phone number verification on user creation
  - forbidClientAccountCreation: Don't let client create user on server
- - phoneVerificationMasterCode: Optional master code if exists let user verify account by entering this code
+ - phoneVerificationMasterCode: Optional master code if exists let user verify account by entering this code  for example  '1234'
+ - adminPhoneNumbers: Optional array of admin phone numbers - don't need to be valid phone numbers for example  ['+972123456789', '+972987654321']
 
 
  In order to change those settings just override the property under :
