@@ -376,7 +376,9 @@ Meteor.methods({requestPhoneVerification: function (phone) {
         check(phone, String);
         // Change phone format to international SMS format
         phone = normalizePhone(phone);
-    } else {
+    }
+
+    if (!phone) {
         throw new Meteor.Error(403, "Not a valid phone");
     }
 
