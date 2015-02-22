@@ -59,7 +59,7 @@ if (Meteor.isClient) (function () {
             this.phone = '+97254580' + (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
             this.password = 'password';
 
-            Accounts.createUser(
+            Accounts.createUserWithPhone(
                 {phone: this.phone, password: this.password},
                 loggedInAs(this.phone, test, expect));
         },
@@ -112,7 +112,7 @@ if (Meteor.isClient) (function () {
             // create user with raw password (no API, need to invoke callLoginMethod
             // directly)
             Accounts.callLoginMethod({
-                methodName     : 'createUser',
+                methodName     : 'createUserWithPhone',
                 methodArguments: [
                     {phone: this.phone, password: this.password}
                 ],
@@ -866,7 +866,7 @@ if (Meteor.isServer) (function () {
         function (test) {
             var phone = '+97254580' + (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
 
-            var userId = Accounts.createUser({phone: phone});
+            var userId = Accounts.createUserWithPhone({phone: phone});
 
             var user = Meteor.users.findOne(userId);
             // no services yet.
@@ -896,7 +896,7 @@ if (Meteor.isServer) (function () {
 
 
             try {
-                Accounts.createUser({phone: phone});
+                Accounts.createUserWithPhone({phone: phone});
             } catch (e) {
                 test.isTrue(e, 'Don\'t two users with same phone');
             }

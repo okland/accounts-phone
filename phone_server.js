@@ -554,7 +554,7 @@ Meteor.methods({createUserWithPhone: function (options) {
 
     return Accounts._loginMethod(
         self,
-        "createUser",
+        "createUserWithPhone",
         arguments,
         "phone",
         function () {
@@ -595,7 +595,7 @@ Meteor.methods({createUserWithPhone: function (options) {
 // true", which we want to prevent the client from setting, but which a custom
 // method calling Accounts.createUser could set?
 //
-Accounts.createUser = function (options, callback) {
+Accounts.createUserWithPhone = function (options, callback) {
     options = _.clone(options);
 
     // XXX allow an optional callback?

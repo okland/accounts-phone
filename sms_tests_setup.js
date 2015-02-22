@@ -39,7 +39,7 @@ Meteor.methods({
 
     createUserOnServer: function (phone) {
         check(phone, String);
-        var userId = Accounts.createUser({phone: phone});
+        var userId = Accounts.createUserWithPhone({phone: phone});
         Accounts.sendPhoneVerificationCode(this.userId, phone);
         return Meteor.users.findOne(userId);
     }

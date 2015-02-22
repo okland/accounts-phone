@@ -130,7 +130,7 @@ Creating new user
   options.password = 'VeryHardPassword';
 
 
-  Accounts.createUser(options, function (){});
+  Accounts.createUserWithPhone(options, function (){});
   // Debug: Verify the user phone isn't confirmed it.
   console.log('Phone verification status is :', Accounts.isPhoneVerified());
 ```
@@ -159,7 +159,7 @@ Login existing user - Requires creating user with password
  var userPhone = '+972545999999';
  var password = 'VerySecure';
  var callback = function() {};
- Accounts.createUser({phone:userPhone, password:password}, function (){});
+ Accounts.createUserWithPhone({phone:userPhone, password:password}, function (){});
 
  Meteor.loginWithPhoneAndPassword({phone:userPhone}, password, callback);
 ```
@@ -185,7 +185,7 @@ Login existing user - Requires creating user with password
   * @param {Object} options.profile The user's profile, typically including the `name` field.
   * @param {Function} [callback] Client only, optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
   */
- Accounts.createUser = function (options, callback) { };
+ Accounts.createUserWithPhone = function (options, callback) { };
 
  /**
   * @summary Request a new verification code.

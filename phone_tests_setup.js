@@ -1,3 +1,9 @@
+
+// Phone test vars setup
+Accounts._options.verificationWaitTime = 1;
+Accounts._options.verificationRetriesWaitTime = 1;
+Accounts._options.verificationMaxRetries = 100;
+
 Accounts.validateNewUser(function (user) {
     if (user.profile && user.profile.invalidAndThrowException)
         throw new Meteor.Error(403, "An exception thrown within Accounts.validateNewUser");
@@ -124,7 +130,7 @@ Meteor.methods({
     testCreateSRPUser: function () {
         var phone = '+97254580'+ (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
         Meteor.users.remove({'phone.number': phone});
-        var userId = Accounts.createUser({'phone.number': phone});
+        var userId = Accounts.createUserWithPhone({'phone.number': phone});
         Meteor.users.update(
             userId,
             { '$set': { 'services.phone.srp': {

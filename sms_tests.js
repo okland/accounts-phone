@@ -4,15 +4,12 @@
 var phone1;
 var code;
 
-// Allow 1 mil between sending sms
-Accounts,_options.verificationWaitTime = 1;
-
 Accounts._isolateLoginTokenForTest();
 
 testAsyncMulti("accounts sms - verification flow", [
     function (test, expect) {
         phone1 = '+97254580'+ (Math.abs(Math.floor(Math.random() * 1000 - 1000)) + 1000);
-        Accounts.createUser({phone: phone1, password: 'foobar'},
+        Accounts.createUserWithPhone({phone: phone1, password: 'foobar'},
             expect(function (error) {
                 test.equal(error, undefined);
                 test.isFalse(Accounts.isPhoneVerified(), 'User phone should not be verified');

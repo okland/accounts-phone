@@ -93,7 +93,7 @@ var srpUpgradePath = function (options, callback) {
 // Attempt to log in as a new user.
 
 /**
- * @summary Create a new user.
+ * @summary Create a new user with phone.
  * @locus Anywhere
  * @param {Object} options
  * @param {String} options.phone The user's full phone number.
@@ -101,7 +101,7 @@ var srpUpgradePath = function (options, callback) {
  * @param {Object} options.profile The user's profile, typically including the `name` field.
  * @param {Function} [callback] Client only, optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
  */
-Accounts.createUser = function (options, callback) {
+Accounts.createUserWithPhone = function (options, callback) {
     options = _.clone(options); // we'll be modifying options
 
     // If no password was given create random one
@@ -113,7 +113,7 @@ Accounts.createUser = function (options, callback) {
     options.password = Accounts._hashPassword(options.password);
 
     Accounts.callLoginMethod({
-        methodName     : 'createUser',
+        methodName     : 'createUserWithPhone',
         methodArguments: [options],
         userCallback   : callback
     });
