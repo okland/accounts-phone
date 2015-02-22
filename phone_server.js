@@ -542,7 +542,7 @@ var createUser = function (options) {
 };
 
 // method for create user. Requests come from the client.
-Meteor.methods({createUser: function (options) {
+Meteor.methods({createUserWithPhone: function (options) {
     var self = this;
 
     check(options, Object);

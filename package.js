@@ -1,6 +1,6 @@
 Package.describe({
     name         : 'okland:accounts-phone',
-    version      : '0.0.7',
+    version      : '0.0.8',
     // Brief, one-line summary of the package.
     summary      : 'A login service based on mobile phone number for Meteor',
     // URL to the Git repository containing the source code for this package.
