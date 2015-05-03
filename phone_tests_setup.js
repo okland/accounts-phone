@@ -5,8 +5,9 @@ Accounts._options.verificationRetriesWaitTime = 1;
 Accounts._options.verificationMaxRetries = 100;
 
 Accounts.validateNewUser(function (user) {
-    if (user.profile && user.profile.invalidAndThrowException)
+    if (user.profile && user.profile.invalidAndThrowException) {
         throw new Meteor.Error(403, "An exception thrown within Accounts.validateNewUser");
+    }
     return !(user.profile && user.profile.invalid);
 });
 

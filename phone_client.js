@@ -9,9 +9,11 @@
 /**
  * @summary Log the user in with a password.
  * @locus Client
- * @param {Object | String} user Either a string interpreted as a phone; or an object with a single key: `phone` or `id`.
+ * @param {Object | String} user Either a string interpreted as a phone;
+ *      or an object with a single key: `phone` or `id`.
  * @param {String} password The user's password.
- * @param {Function} [callback] Optional callback. Called with no arguments on success, or with a single `Error` argument on failure.
+ * @param {Function} [callback] Optional callback. Called with no arguments on success,
+ *      or with a single `Error` argument on failure.
  */
 Meteor.loginWithPhoneAndPassword = function (selector, password, callback) {
     if (typeof selector === 'string')
