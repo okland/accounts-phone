@@ -1,6 +1,6 @@
 Package.describe({
     name         : 'okland:accounts-phone',
-    version      : '0.0.10',
+    version      : '0.0.10_1',
     // Brief, one-line summary of the package.
     summary      : 'A login service based on mobile phone number, For Meteor.',
     // URL to the Git repository containing the source code for this package.
@@ -17,7 +17,7 @@ Npm.depends({
 });
 
 Package.onUse(function (api) {
-    api.use('npm-bcrypt@=0.7.7', 'server');
+    api.use('npm-bcrypt@=0.7.8_2', 'server');
 
     api.use('accounts-base@1.0.2', ['client', 'server']);
     // Export Accounts (etc) to packages using this one.
