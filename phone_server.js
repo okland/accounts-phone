@@ -541,47 +541,52 @@ var createUser = function (options) {
     }
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 // method for create user. Requests come from the client.
-Meteor.methods({createUserWithPhone: function (options) {
-    var self = this;
+Meteor.methods({
+    createUserWithPhone: function (options) {
+        var self = this;
 
-    check(options, Object);
-    if (options.phone) {
-        check(options.phone, String);
-        // Change phone format to international SMS format
-        options.phone = normalizePhone(options.phone);
-    }
-
-    return Accounts._loginMethod(
-        self,
-        "createUserWithPhone",
-        arguments,
-        "phone",
-        function () {
-            if (Accounts._options.forbidClientAccountCreation)
-                return {
-                    error: new Meteor.Error(403, "Signups forbidden")
-                };
-
-            // Create user. result contains id and token.
-            var userId = createUser(options);
-            // safety belt. createUser is supposed to throw on error. send 500 error
-            // instead of sending a verification email with empty userid.
-            if (!userId)
-                throw new Error("createUser failed to insert new user");
-
-            // If `Accounts._options.sendPhoneVerificationCodeOnCreation` is set, register
-            // a token to verify the user's primary phone, and send it to
-            // by sms.
-            if (options.phone && Accounts._options.sendPhoneVerificationCodeOnCreation) {
-                Accounts.sendPhoneVerificationCode(userId, options.phone);
-            }
-
-            // client gets logged in as the new user afterwards.
-            return {userId: userId};
+        check(options, Object);
+        if (options.phone) {
+            check(options.phone, String);
+            // Change phone format to international SMS format
+            options.phone = normalizePhone(options.phone);
         }
-    );
-}});
+
+        return Accounts._loginMethod(
+            self,
+            "createUserWithPhone",
+            arguments,
+            "phone",
+            function () {
+                if (Accounts._options.forbidClientAccountCreation)
+                    return {
+                        error: new Meteor.Error(403, "Signups forbidden")
+                    };
+
+                // Create user. result contains id and token.
+                var userId = createUser(options);
+                // safety belt. createUser is supposed to throw on error. send 500 error
+                // instead of sending a verification email with empty userid.
+                if (!userId)
+                    throw new Error("createUser failed to insert new user");
+
+                // If `Accounts._options.sendPhoneVerificationCodeOnCreation` is set, register
+                // a token to verify the user's primary phone, and send it to
+                // by sms.
+                if (options.phone && Accounts._options.sendPhoneVerificationCodeOnCreation) {
+                    Accounts.sendPhoneVerificationCode(userId, options.phone);
+                }
+
+                // client gets logged in as the new user afterwards.
+                return {userId: userId};
+            }
+        );
+    }
+});
 
 // Create user directly on the server.
 //
@@ -709,3 +714,74 @@ var getRandomDigit = function () {
     return Math.floor((Math.random() * 9) + 1);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///
+/// CHANGING USER PHONE
+/// Added by Tabrez Ahmed, 
+/// https://github.com/ahmedtabrez
+
+// Changes a user's phone and make the new number unverified
+// Pretty much similar to createUser function
+
+
+
+var changeUserPhone = function (phone) {
+
+    check({phone:phone}, Match.ObjectIncluding({
+        phone   : Match.Optional(String)
+    }));
+
+    if(phone)
+        phone = normalizePhone(phone);
+
+    if (!phone)
+        throw new Meteor.Error(400, "Wrong phone number");
+
+
+    var existingUser = Meteor.users.findOne(
+        {'phone.number': phone});
+
+    if (existingUser) {
+        if(Meteor.userId() == existingUser._id){
+            throw new Meteor.Error(400, "Already the current phone number")
+        }
+        throw new Meteor.Error(403, "User with this phone number already exists");
+    }
+
+    var newPhone = {number: phone, verified: false};
+
+    try {
+        return Accounts.users.update(Meteor.user()._id,{$set: {phone: newPhone}});
+    } catch (e) {
+
+        // XXX string parsing sucks, maybe
+        // https://jira.mongodb.org/browse/SERVER-3069 will get fixed one day
+        if (e.name !== 'MongoError') throw e;
+        var match = e.err.match(/E11000 duplicate key error index: ([^ ]+)/);
+        if (!match) throw e;
+        if (match[1].indexOf('users.$phone.number') !== -1)
+            throw new Meteor.Error(403, "Phone number already exists, failed on creation.");
+        throw e;
+    }
+};
+
+
+
+Accounts.changeUserPhone = function(number,callback){
+    if(changeUserPhone(number)){
+        Accounts.sendPhoneVerificationCode (Meteor.userId(), number);
+        if(callback){
+            callback();
+        }
+        return true;
+    }
+    return false;
+}
+
+
+Meteor.methods({
+    changeUserPhone: function(phone){
+        return Accounts.changeUserPhone(phone);
+    }
+});
