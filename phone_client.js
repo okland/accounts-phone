@@ -185,13 +185,6 @@ Accounts.isPhoneVerified = function () {
     return !!(me && me.phone && me.phone.verified);
 };
 
-Accounts.changeUserPhone = function (newPhone, callback) {
-    Meteor.call('changeUserPhone',newPhone, function(error,result){
-        callback(error,result);
-    })
-};
-
-
 
 Accounts.changeUserPhone = function (newPhone, callback) {
     Meteor.call('changeUserPhone',newPhone, function(error,result){
