@@ -52,7 +52,7 @@ console.log('Phone verification status is :', Accounts.isPhoneVerified());
 If you are using twilio :
  you can just put your twilio credentials on server.
 ```js
-SMS.twilio = {ACCOUNT_SID: 'XXXXXXXXXXXXXXXXXXXXX', AUTH_TOKEN: 'XXXXXXXXXXXXXXXXXXXX'};
+SMS.twilio = {FROM: 'XXXXXXXXXXXX', ACCOUNT_SID: 'XXXXXXXXXXXXXXXXXXXXX', AUTH_TOKEN: 'XXXXXXXXXXXXXXXXXXXX'};
 ```
 
 otherwise you can just override the function
