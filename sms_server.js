@@ -65,12 +65,14 @@ SMS.send = function (options) {
             return;
     if (SMS.twilio) {
         var client = Twilio(SMS.twilio.ACCOUNT_SID, SMS.twilio.AUTH_TOKEN);
+        // Include FROM in options if it defined. 
+        SMS.twilio.FROM && (options.from = SMS.twilio.FROM);
         // Send SMS  API async func
         var sendSMSSync = Meteor.wrapAsync(client.sendMessage, client);
         // call the sync version of our API func with the parameters from the method call
         var result = sendSMSSync(options, function (err, responseData) { //this function is executed when a response is received from Twilio
             if (err) { // "err" is an error received during the request, if any
-                throw new Meteor.Error("Error sending SMS ", err);
+                throw new Meteor.Error("Error sending SMS ", err.message);
             }
             return responseData;
         });
