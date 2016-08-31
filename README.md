@@ -1,5 +1,3 @@
-##Use this version if you are getting error for bcrypt version. The version in this is 0.9.0
-
 Accounts-Phone
 =========================
 
